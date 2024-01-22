@@ -1,0 +1,129 @@
+<script setup>
+import AdminLayout from "@/Layouts/AdminLayout.vue";
+import InputError from "@/Components/InputError.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { Head, Link, useForm } from "@inertiajs/vue3";
+import Table from "@/Components/Table.vue";
+import TableRow from "@/Components/TableRow.vue";
+import TableDataCell from "@/Components/TableDataCell.vue";
+import TableHeaderCell from "@/Components/TableHeaderCell.vue";
+import { onMounted, watch } from "vue";
+
+const props = defineProps({
+  user: {
+    type: Object,
+    required: true,
+  },
+  role: {
+    type: Object
+  },
+  roles: Object,
+});
+const form = useForm({
+  name: props.user?.name || "", // Check if props.user is defined
+  email: props.user?.email || "",
+  role: props.role?.name || "", // Check if props.role is defined
+});
+
+
+
+
+
+const submit = () => {
+  form.put(route("admin.users.update", props.user?.id));
+};
+</script>
+
+<template>
+  <AdminLayout>
+    <Head title="Create user" />
+    <div class="max-w-7xl mx-auto mt-4">
+      <div class="flex justify-between">
+        <Link
+          :href="route('admin.users.index')"
+          class="px-3 py-2 text-white font-semibold bg-oceaned hover:bg-indigo-700 rounded"
+          >Back</Link
+        >
+      </div>
+    </div>
+    <div class="max-w-6xl mx-auto mt-6 p-6 bg-slate-100">
+      <form @submit.prevent="submit">
+        <div class="mt-4">
+          <InputLabel for="name" value="Name" />
+
+          <TextInput
+            id="name"
+            type="text"
+            class="mt-1 block w-full"
+            v-model="form.name"
+            required
+            autofocus
+            autocomplete="name"
+          />
+
+          <InputError class="mt-2" :message="form.errors.name" />
+        </div>
+
+        <div class="mt-4">
+          <InputLabel for="email" value="Email" />
+
+          <TextInput
+            id="email"
+            type="email"
+            class="mt-1 block w-full"
+            v-model="form.email"
+            required
+            autocomplete="username"
+          />
+
+          <InputError class="mt-2" :message="form.errors.email" />
+        </div>
+
+        <div class="mt-4">
+      <InputLabel for="roles" value="Roles" />
+
+      <select
+        id="roles"
+        class="mt-1 block w-full  rounded-md"
+        v-model="form.role"
+      >
+        <option value="" disabled>Select some roles</option>
+        <option v-for="role in roles" :key="role.id" :value="role.name">{{ role.name }}</option>
+      </select>
+
+      <InputError class="mt-2 " :message="form.errors.role" />
+    </div>
+
+
+    <ul role="list" class="mt-4 divide-y divide-gray-100 rounded-md border border-gray-200">
+      <li 
+      :key="name" v-for="name in roles[form.role]?.permissions.map(permission => permission.name)"
+      class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
+              <div class="flex w-0 flex-1 items-center">
+                <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                  <span class="truncate font-medium">{{ name }}</span>
+                </div>
+              </div>
+            </li>
+    </ul>
+   
+
+        <div class="flex items-center justify-end mt-4">
+          <PrimaryButton
+            class="ml-4"
+            :class="{ 'opacity-25': form.processing }"
+            :disabled="form.processing"
+          >
+            Update User
+          </PrimaryButton>
+        </div>
+      </form>
+    </div>
+ 
+ 
+
+  
+  </AdminLayout>
+</template>
